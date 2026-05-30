@@ -26,16 +26,16 @@ translations = {
         "align": "right",
         "title": "منصة آسِر الذكية للتفاعل الصوتي",
         "subtitle": "بيئة تعليمية متطورة لتحليل نبرة الحماس أثناء القراءة مباشرة",
-        "input_label": "📖 اختر نصاً للقراءة أو اكتب نصك الخاص:",
+        "input_label": "📖 اختر نصاً كاملاً للقراءة أو اكتب نصك الخاص:",
         "placeholder": "اختر من القائمة أعلاه أو اكتب هنا النص المراد التدرب عليه...",
         "ai_label": "🧠 رد المساعد الذكي (آسِر):",
         "ai_default": "مرحباً بك يا صديقي! أنا جاهز للاستماع إليك ومشاركتك رحلة القراءة. ✨📚",
         "custom_text": "✍️ نص مخصص (اكتب نصك هنا)",
         "passages": [
             "✍️ نص مخصص (اكتب نصك هنا)",
-            "الحرية شمس يجب أن تشرق في كل نفس، فمن عاش محرومًا منها عاش في ظلمة حالكة.",
-            "النجاح ليس مفتاح السعادة، بل السعادة هي مفتاح النجاح. إذا كنت تحب ما تفعل، فستنجح بالتأكيد.",
-            "القراءة تغذي العقل، وتفتح أبواب المعرفة، وتأخذنا في رحلات ساحرة عبر الزمن دون أن نتحرك من مكاننا."
+            "الحرية شمس يجب أن تشرق في كل نفس، فمن عاش محرومًا منها عاش في ظلمة حالكة لا يرى فيها نوراً الشروق. إن القيمة الحقيقية للإنسان تكمن في قدرته على اتخاذ قراراته بنفسه وبناء مستقبله بكل ثقة وإصرار، فالأمم لا تنهض ولا ترتقي إلا عندما يتنفس أفرادها عبير الحرية والكرامة.",
+            "النجاح ليس مفتاح السعادة، بل إن السعادة الحقيقية والرضا الداخلي هما المفتاح الأساسي للنجاح. إذا كنت تحب ما تفعله، وتمتلك الشغف اليومي للاستمرار والتعلم من الأخطاء دون استسلام، فستصل بالتأكيد إلى أهدافك وتصنع لنفسك مساراً متميزاً يلهم الآخرين من حولك.",
+            "القراءة هي الغذاء الحقيقي للعقل، وهي النافذة السحرية التي تفتح لنا أبواب المعرفة الواسعة وتأخذنا في رحلات مذهلة عبر الزمن والبلدان دون أن نتحرك من مكاننا. من يعشق القراءة لا يشعر بالوحدة أبداً، لأن الكتب تصبح أعز أصدقائه وتمنحه الحكمة والخبرة لمواجهة الحياة."
         ],
         "mic_btn_idle": "🎙️ اضغط لتفعيل الاتصال الصوتي المباشر",
         "mic_btn_active": "🟢 النظام متصل ويحلل صوتك الآن...",
@@ -50,16 +50,16 @@ translations = {
         "align": "left",
         "title": "Aser Smart Audio Interactive Platform",
         "subtitle": "An advanced educational environment to analyze reading enthusiasm in real-time",
-        "input_label": "📖 Choose a reading passage or write your own:",
+        "input_label": "📖 Choose a full passage or write your own:",
         "placeholder": "Select from the list above or type your own text here...",
         "ai_label": "🧠 Smart Assistant Reply (Aser):",
         "ai_default": "Hello my friend! I am ready to listen to you and share your reading journey. ✨📚",
         "custom_text": "✍️ Custom Text (Type your own)",
         "passages": [
             "✍️ Custom Text (Type your own)",
-            "The early bird catches the worm. Success comes to those who prepare well and work hard.",
-            "Reading is to the mind what exercise is to the body. It expands our horizons and inspires our souls.",
-            "Believe you can and you're halfway there. Confidence and enthusiasm are the keys to achievements."
+            "The early bird catches the worm, which means that success and outstanding achievement come to those who prepare well, wake up with determination, and work hard while others are still resting. True dedication is the golden key that opens doors to incredible opportunities and shapes a bright and prosperous future.",
+            "Reading is to the mind what physical exercise is to the human body. It continuously expands our horizons, enhances our critical thinking, and inspires our souls to reach greatness. When you open a book, you explore new ideas and travel through unique worlds and times without moving an inch from your comfortable seat.",
+            "Believe you can and you are already halfway there. Confidence, combined with passion and unyielding enthusiasm, is the ultimate driver of human achievements. No matter how many challenges you face on your journey, maintaining a positive mindset and a strong voice will always guide you directly to victory."
         ],
         "mic_btn_idle": "🎙️ Click to activate live voice connection",
         "mic_btn_active": "🟢 System is connected and analyzing your voice...",
@@ -73,7 +73,7 @@ translations = {
 
 t = translations[st.session_state.lang]
 
-# --- 3. تصميم الـ CSS ---
+# --- 3. تصميم الـ CSS المطور (لتكبير الخط وتوسيع الحقل) ---
 st.markdown(f"""
     <style>
     .stApp {{ background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%); }}
@@ -81,6 +81,14 @@ st.markdown(f"""
     .subtitle {{ color: #64748B; text-align: center; font-family: 'Segoe UI', sans-serif; font-size: 15px; margin-bottom: 25px; }}
     div[data-baseweb="input"], div[data-baseweb="select"] {{ border-radius: 12px !important; }}
     div[data-testid="stMarkdownContainer"] {{ text-align: {t['align']}; }}
+    
+    /* ستايل مخصص لتكبير خط حقل النصوص وجعله مريحاً جداً للقراءة */
+    textarea {{
+        font-size: 18px !important;
+        font-family: 'Segoe UI', system-ui, sans-serif !important;
+        line-height: 1.6 !important;
+        color: #334155 !important;
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -104,7 +112,6 @@ if "last_text" not in st.session_state:
     st.session_state.last_text = ""
 
 # --- 5. واجهة المايكروفون والمؤشر اللحظي الهجينة والنظيفة ---
-# قمنا بتقسيم كود جافا سكريبت لضمان عدم حدوث أي خطأ في علامات التنصيص الثلاثية
 html_code = """
 <div id="aser-card" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); font-family: 'Segoe UI', sans-serif;">
     <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px;">
@@ -181,80 +188,4 @@ micBtn.onclick = async function() {
             let targetPercentage = Math.min(Math.round((average / 45) * 100), 100);
             
             progressBar.style.width = targetPercentage + "%";
-            percentageTxt.innerText = targetPercentage + "%";
-            
-            let targetState = "sleep";
-            if (targetPercentage >= 70) { targetState = "high"; }
-            else if (targetPercentage >= 20) { targetState = "normal"; }
-            
-            if (targetState !== stableState) {
-                if (!stateTimer) {
-                    stateTimer = setTimeout(() => {
-                        stableState = targetState;
-                        if (stableState === "high") { emojiDiv.innerText = "🤩"; statusTxt.innerText = ui.statusHigh; }
-                        else if (stableState === "normal") { emojiDiv.innerText = "😊"; statusTxt.innerText = ui.statusNormal; }
-                        else { emojiDiv.innerText = "🥱"; statusTxt.innerText = ui.statusIdle; }
-                        stateTimer = null;
-                    }, 350);
-                }
-            } else {
-                if (stateTimer) { clearTimeout(stateTimer); stateTimer = null; }
-                if (stableState === "high") progressBar.style.backgroundColor = "#10B981";
-                else if (stableState === "normal") progressBar.style.backgroundColor = "#3B82F6";
-                else progressBar.style.backgroundColor = "#94A3B8";
-            }
-        }
-    } catch (err) { alert("Microphone error / خطأ في المايكروفون"); }
-};
-</script>
-"""
-
-# استبدال متغيرات الواجهة بشكل آمن وصارم لمنع تداخل اللغات
-configured_html = html_code\
-    .replace("DIRECTION_VAL", t["direction"])\
-    .replace("ALIGN_VAL", t["align"])\
-    .replace("STATUS_TITLE_VAL", t["status_title"])\
-    .replace("STATUS_IDLE_VAL", t["status_idle"])\
-    .replace("STATUS_NORMAL_VAL", t["status_normal"])\
-    .replace("STATUS_HIGH_VAL", t["status_high"])\
-    .replace("INDICATOR_TITLE_VAL", t["indicator_title"])\
-    .replace("MIC_BTN_IDLE_VAL", t["mic_btn_idle"])\
-    .replace("MIC_BTN_ACTIVE_VAL", t["mic_btn_active"])
-
-components.html(configured_html, height=240)
-st.write("")
-
-# --- 6. حقل النصوص المدمجة والمدخلات ذو الاتجاه المتغير ---
-st.markdown(f"<p style='font-weight: 600; color: #475569; font-size: 14px; margin-bottom: 5px;'>{t['input_label']}</p>", unsafe_allow_html=True)
-
-selected_passage = st.selectbox(
-    label="Passage Selector",
-    options=t["passages"],
-    label_visibility="collapsed"
-)
-
-default_text_val = "" if selected_passage == t["custom_text"] else selected_passage
-
-teacher_text = st.text_area(
-    label="Text Area",
-    placeholder=t["placeholder"],
-    value=default_text_val,
-    height=90,
-    label_visibility="collapsed"
-)
-
-if teacher_text and teacher_text != st.session_state.last_text:
-    st.session_state.last_text = teacher_text
-    if client:
-        try:
-            prompt = f"أنت طالب ذكي ومشجع اسمه آسر. رد باختصار شديد جداً (سطر واحد) وبأسلوب تعليمي لطيف ومشجع بنفس لغة النص التالية التي كتبها لك معلمك أو صديقك الآن: {teacher_text}."
-            if st.session_state.lang == "English":
-                prompt = f"You are a smart and encouraging student named Aser. Reply very briefly (one short line) in a kind and educational manner in English to this sentence written by your teacher or friend: {teacher_text}."
-                
-            response = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
-            st.session_state.ai_reply = response.text
-        except:
-            st.session_state.ai_reply = t["ai_default"]
-
-st.markdown(f"<p style='font-weight: 600; color: #475569; font-size: 14px; margin-bottom: 5px;'>{t['ai_label']}</p>", unsafe_allow_html=True)
-st.info(st.session_state.ai_reply)
+            percentageTxt.innerText = targetPercentage +
