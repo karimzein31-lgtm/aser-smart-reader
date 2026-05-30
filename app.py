@@ -1,6 +1,7 @@
 import streamlit as st
 from google import genai
 import streamlit.components.v1 as components
+import os
 
 # --- 1. إعدادات الصفحة واللغة ---
 st.set_page_config(page_title="منصة آسر التعليمية", page_icon="🤖", layout="centered")
@@ -15,7 +16,7 @@ with col_lang:
         st.session_state.lang = current_lang
         st.rerun()
 
-# --- 2. قاموس البيانات والنصوص المطولة المدمجة ---
+# --- 2. قاموس البيانات والنصوص المطولة ---
 translations = {
     "العربية": {
         "direction": "rtl", "align": "right",
@@ -59,71 +60,57 @@ translations = {
 
 t = translations[st.session_state.lang]
 
-# --- 3. تصميم الـ CSS الكرتوني العصري (Neo-Brutalist Style) ---
+# --- 3. تصميم الـ CSS الكرتوني العصري (Neo-Brutalist) ---
 st.markdown(f"""
     <style>
-    /* تغيير خلفية الموقع الكاملة لتطابق الصورة المرفقة */
     .stApp {{ background-color: #FFFDF0 !important; }}
+    .main-title {{ color: #000000; font-family: 'Segoe UI', sans-serif; text-align: center; font-weight: 900; font-size: 34px; margin-top: 5px; }}
+    .subtitle {{ color: #333333; text-align: center; font-family: 'Segoe UI', sans-serif; font-size: 15px; margin-bottom: 20px; font-weight: 500; }}
     
-    .main-title {{ 
-        color: #000000; 
-        font-family: 'Segoe UI', system-ui, sans-serif; 
-        text-align: center; 
-        font-weight: 900; 
-        font-size: 36px; 
-        margin-top: 5px;
-    }}
-    .subtitle {{ 
-        color: #333333; 
-        text-align: center; 
-        font-family: 'Segoe UI', sans-serif; 
-        font-size: 16px; 
-        margin-bottom: 25px;
-        font-weight: 500;
-    }}
-    
-    /* جعل حقول الإدخال والقوائم بتصميم كرتوني حاد الحواف */
+    /* حقول الإدخال والقوائم الكرتونية حادة الحواف */
     div[data-baseweb="input"], div[data-baseweb="select"], .stSelectbox, .stTextArea {{ 
-        border: 3px solid #000000 !important;
-        border-radius: 12px !important;
-        box-shadow: 4px 4px 0px #000000 !important;
-        background-color: #FFFFFF !important;
+        border: 3px solid #000000 !important; border-radius: 12px !important;
+        box-shadow: 4px 4px 0px #000000 !important; background-color: #FFFFFF !important;
     }}
     div[data-testid="stMarkdownContainer"] {{ text-align: {t['align']}; }}
     
-    /* تكبير خط النصوص الطويلة لـ 18px */
-    textarea {{ 
-        font-size: 18px !important; 
-        font-family: 'Segoe UI', sans-serif !important; 
-        line-height: 1.6 !important; 
-        color: #000000 !important;
-        background-color: #FFFFFF !important;
-    }}
+    /* حجم خط نصوص القراءة المطور لـ 18px */
+    textarea {{ font-size: 18px !important; font-family: 'Segoe UI', sans-serif !important; line-height: 1.6 !important; color: #000000 !important; }}
     
-    /* صندوق رد الذكاء الاصطناعي كرتوني فخم باللون البرتقالي الدافئ */
-    .stAlert {{
-        border: 3px solid #000000 !important;
-        border-radius: 16px !important;
-        box-shadow: 5px 5px 0px #000000 !important;
-        background-color: #FFFAF0 !important;
+    .stAlert {{ border: 3px solid #000000 !important; border-radius: 16px !important; box-shadow: 5px 5px 0px #000000 !important; background-color: #FFFAF0 !important; }}
+    
+    /* تصميم خاص مخصص لإبراز حواف البانر المرفوع من كانفا */
+    .canva-banner {{
+        border: 3px solid #000000;
+        border-radius: 16px;
+        box-shadow: 6px 6px 0px #000000;
+        margin-bottom: 25px;
+        overflow: hidden;
     }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. إعداد الـ API ---
+# --- 4. إدراج تصميم كانفا في أعلى الصفحة ---
+# يبحث الكود عن الصورة المرفوعة؛ إذا وجدها يعرضها بستايل كرتوني محاط بإطار أسود، وإذا لم يجدها يعرض العنوان النصي العادي.
+if os.path.exists("header.png"):
+    st.markdown('<div class="canva-banner">', unsafe_allow_html=True)
+    st.image("header.png", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+else:
+    st.markdown(f"<div class='main-title'>{t['title']}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='subtitle'>{t['subtitle']}</div>", unsafe_allow_html=True)
+
+# --- 5. إعداد الـ API ---
 API_KEY = "AIzaSyAOBg67pMTj2gYrc7PCs2MmRzQGhfedGmI"
 @st.cache_resource
 def get_ai_client():
     return genai.Client(api_key=API_KEY) if (API_KEY and "ضـع" not in API_KEY) else None
 client = get_ai_client()
 
-st.markdown(f"<div class='main-title'>{t['title']}</div>", unsafe_allow_html=True)
-st.markdown(f"<div class='subtitle'>{t['subtitle']}</div>", unsafe_allow_html=True)
-
 if "ai_reply" not in st.session_state: st.session_state.ai_reply = t["ai_default"]
 if "last_text" not in st.session_state: st.session_state.last_text = ""
 
-# --- 5. كود الـ HTML وجافا سكريبت الكرتوني بالكامل وحواف سوداء عريضة ---
+# --- 6. كود الـ HTML والمؤشر الصوتي التفاعلي اللحظي ---
 html_code = """
 <div id="box" style="background:#FFFFFF; border: 3px solid #000000; border-radius: 16px; padding: 25px; box-shadow: 6px 6px 0px #000000; font-family:'Segoe UI', sans-serif; margin-bottom: 10px;">
     <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px;">
@@ -165,7 +152,7 @@ btn.onclick = async function() {
     if (isList) return;
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true }, video:false });
-        isList = true; btn.innerText = cfg.act; btn.style.backgroundColor = "#E11D48"; // لون أحمر نيون عند الاتصال
+        isList = true; btn.innerText = cfg.act; btn.style.backgroundColor = "#E11D48";
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const ans = ctx.createAnalyser(); ctx.createMediaStreamSource(stream).connect(ans);
         const node = ctx.createScriptProcessor(2048, 1, 1); ans.connect(node); node.connect(ctx.destination);
@@ -206,7 +193,7 @@ configured_html = html_code\
 components.html(configured_html, height=260)
 st.write("")
 
-# --- 6. حقل المدخلات الكرتوني المطور ---
+# --- 7. حقل المدخلات ونصوص المعلم ---
 st.markdown(f"<p style='font-weight: 800; color: #000000; font-size: 15px; margin-bottom: 5px;'>{t['input_label']}</p>", unsafe_allow_html=True)
 
 selected_passage = st.selectbox(label="Passage Selector", options=t["passages"], label_visibility="collapsed")
