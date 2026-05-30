@@ -59,12 +59,12 @@ if "ai_reply" not in st.session_state:
 if "last_text" not in st.session_state:
     st.session_state.last_text = ""
 
-# --- 4. محرك البث اللحظي المطور بالتنعيم والتهدئة البرمجية ---
+# --- 4. محرك البث اللحظي المطور بكبح الحساسية للموبايل ---
 professional_ui_html = """
 <div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); font-family: 'Segoe UI', system-ui, sans-serif; direction: rtl;">
     
     <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 25px;">
-        <div id="emoji" style="font-size: 55px; background: #F8FAFC; padding: 10px 20px; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); transition: all 0.4deg cubic-bezier(0.4, 0, 0.2, 1);">😴</div>
+        <div id="emoji" style="font-size: 55px; background: #F8FAFC; padding: 10px 20px; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);">😴</div>
         <div style="text-align: right;">
             <div style="color: #94A3B8; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 2px;">حالة المساعد الذكي</div>
             <div id="status-text" style="color: #334155; font-size: 15px; font-weight: 600; transition: color 0.3s;">آسر في انتظار بدء القراءة المستمرة...</div>
@@ -96,15 +96,22 @@ const progressBar = document.getElementById('progress-bar');
 const percentageTxt = document.getElementById('percentage-txt');
 let isListening = false;
 
-// متغيرات الذاكرة لتهدئة ومنع القفزات السريعة
-let currentLevel = 0;
-let stableState = "sleep"; // sleep, normal, high
+let stableState = "sleep"; 
 let stateTimer = null;
 
 micBtn.onclick = async function() {
     if (isListening) return;
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        // تعديل هائل: محاولة إيقاف التحكم التلقائي في مستوى الصوت وتقليل الضوضاء المزعجة بالموبايل
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: false // منع الموبايل من تضخيم النبرة الهادئة تلقائياً
+            }, 
+            video: false 
+        });
+        
         isListening = true;
         micBtn.innerText = "🟢 النظام متصل ويحلل صوتك الآن...";
         micBtn.style.backgroundColor = "#10B981";
@@ -115,7 +122,6 @@ micBtn.onclick = async function() {
         const microphone = audioContext.createMediaStreamSource(stream);
         const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
         
-        // رفع التنعيم لأعلى درجة (0.85) لجعل حركة المؤشر انسيابية جداً وليست عصبية
         analyser.smoothingTimeConstant = 0.85;
         analyser.fftSize = 256;
         
@@ -130,36 +136,35 @@ micBtn.onclick = async function() {
             for (let i = 0; i < array.length; i++) { values += array[i]; }
             let average = values / array.length;
             
-            if (average < 6) average = 0; 
-            let targetPercentage = Math.min(Math.round((average / 55) * 100), 100);
+            // رفع حد تجاهل الأصوات الهادئة كلياً (عتبة الصمت) لقتل الحساسية الخلفية
+            if (average < 15) average = 0; 
             
-            // تحديث النسبة المئوية وشريط التقدم تدريجياً وبنعومة
+            // كبح الحماس الصوتي: رفعنا القاسم هنا من 55 إلى 120 لكي لا تصل لـ 100% إلا بالصراخ أو الحماس الشديد
+            let targetPercentage = Math.min(Math.round((average / 120) * 100), 100);
+            
             progressBar.style.width = targetPercentage + "%";
             percentageTxt.innerText = targetPercentage + "%";
             
-            // تحديد الحالة المستهدفة بناءً على نبرة الصوت الحالية
             let targetState = "sleep";
-            if (targetPercentage >= 65) {
+            if (targetPercentage >= 70) {
                 targetState = "high";
             } else if (targetPercentage >= 20) {
                 targetState = "normal";
             }
             
-            // آلية التهدئة (Debounce): لا نغير الإيموجي والنص فوراً، بل ننتظر نصف ثانية (500ms) للتأكد من استقرار النبرة
             if (targetState !== stableState) {
                 if (!stateTimer) {
                     stateTimer = setTimeout(() => {
                         stableState = targetState;
                         updateVisuals(stableState, targetPercentage);
                         stateTimer = null;
-                    }, 500); // 500 مللي ثانية للثبات والاتزان
+                    }, 400); 
                 }
             } else {
                 if (stateTimer) {
                     clearTimeout(stateTimer);
                     stateTimer = null;
                 }
-                // تحديث طفيف للون الشريط حتى لو كانت الحالة ثابتة
                 if (stableState === "high") progressBar.style.backgroundColor = "#10B981";
                 else if (stableState === "normal") progressBar.style.backgroundColor = "#3B82F6";
                 else progressBar.style.backgroundColor = "#94A3B8";
@@ -170,7 +175,6 @@ micBtn.onclick = async function() {
     }
 };
 
-// دالة تحديث الواجهات الهادئة والموزونة
 function updateVisuals(state, percentage) {
     if (state === "high") {
         emojiDiv.innerText = "🤩";
