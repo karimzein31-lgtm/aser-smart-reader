@@ -13,7 +13,6 @@ st.set_page_config(
 if "lang" not in st.session_state:
     st.session_state.lang = "العربية"
 
-# زر تبديل اللغة في أعلى الصفحة بشكل أنيق
 col_space, col_lang = st.columns([4, 1])
 with col_lang:
     current_lang = st.selectbox("🌐 Language / اللغة", ["العربية", "English"], index=0 if st.session_state.lang == "العربية" else 1)
@@ -21,7 +20,6 @@ with col_lang:
         st.session_state.lang = current_lang
         st.rerun()
 
-# قاموس النصوص والترجمات لواجهة المستخدم
 translations = {
     "العربية": {
         "direction": "rtl",
@@ -75,34 +73,14 @@ translations = {
 
 t = translations[st.session_state.lang]
 
-# --- 3. تصميم الـ CSS المتجاوب مع الاتجاهين ---
+# --- 3. تصميم الـ CSS ---
 st.markdown(f"""
     <style>
-    .stApp {{
-        background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
-    }}
-    .main-title {{
-        color: #1E293B;
-        font-family: 'Segoe UI', system-ui, sans-serif;
-        text-align: center;
-        font-weight: 700;
-        font-size: 32px;
-        margin-top: 10px;
-        margin-bottom: 5px;
-    }}
-    .subtitle {{
-        color: #64748B;
-        text-align: center;
-        font-family: 'Segoe UI', sans-serif;
-        font-size: 15px;
-        margin-bottom: 25px;
-    }}
-    div[data-baseweb="input"], div[data-baseweb="select"] {{
-        border-radius: 12px !important;
-    }}
-    div[data-testid="stMarkdownContainer"] {{
-        text-align: {t['align']};
-    }}
+    .stApp {{ background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%); }}
+    .main-title {{ color: #1E293B; font-family: 'Segoe UI', sans-serif; text-align: center; font-weight: 700; font-size: 32px; margin-top: 10px; }}
+    .subtitle {{ color: #64748B; text-align: center; font-family: 'Segoe UI', sans-serif; font-size: 15px; margin-bottom: 25px; }}
+    div[data-baseweb="input"], div[data-baseweb="select"] {{ border-radius: 12px !important; }}
+    div[data-testid="stMarkdownContainer"] {{ text-align: {t['align']}; }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -125,36 +103,45 @@ if "ai_reply" not in st.session_state:
 if "last_text" not in st.session_state:
     st.session_state.last_text = ""
 
-# --- 5. محرك البث اللحظي الآمن والمفصول برمجياً عن تعارض الأقواس ---
-raw_html_template = """
-<div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); font-family: 'Segoe UI', system-ui, sans-serif; direction: DIRECTION_HOLDER;">
-    
+# --- 5. واجهة المايكروفون والمؤشر اللحظي الهجينة والنظيفة ---
+# قمنا بتقسيم كود جافا سكريبت لضمان عدم حدوث أي خطأ في علامات التنصيص الثلاثية
+html_code = """
+<div id="aser-card" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); font-family: 'Segoe UI', sans-serif;">
     <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px;">
-        <div id="emoji" style="font-size: 55px; background: #F8FAFC; padding: 10px 20px; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); transition: all 0.4s ease;">😴</div>
-        <div style="text-align: ALIGN_HOLDER;">
-            <div style="color: #94A3B8; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 2px;">STATUS_TITLE_HOLDER</div>
-            <div id="status-text" style="color: #334155; font-size: 15px; font-weight: 600;">STATUS_IDLE_HOLDER</div>
+        <div id="emoji" style="font-size: 55px; background: #F8FAFC; padding: 10px 20px; border-radius: 50%; transition: all 0.4s ease;">😴</div>
+        <div id="status-block">
+            <div id="status-title-lbl" style="color: #94A3B8; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 2px;"></div>
+            <div id="status-text" style="color: #334155; font-size: 15px; font-weight: 600;"></div>
         </div>
     </div>
-
     <div style="margin-bottom: 20px;">
         <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">
-            <span>INDICATOR_TITLE_HOLDER</span>
+            <span id="indicator-title-lbl"></span>
             <span id="percentage-txt">0%</span>
         </div>
         <div style="background-color: #F1F5F9; border-radius: 9999px; height: 8px; width: 100%; overflow: hidden;">
-            <div id="progress-bar" style="background-color: #2563EB; height: 100%; width: 0%; transition: width 0.3s ease, background-color 0.4s;"></div>
+            <div id="progress-bar" style="background-color: #2563EB; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
         </div>
     </div>
-
     <div style="text-align: center;">
-        <button id="micBtn" style="background-color: #2563EB; color: #FFFFFF; border: none; padding: 14px 40px; border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(37,99,235,0.2); transition: all 0.2s ease; width: 100%; max-width: 400px;">
-            MIC_BTN_IDLE_HOLDER
-        </button>
+        <button id="micBtn" style="background-color: #2563EB; color: #FFFFFF; border: none; padding: 14px 40px; border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: 600; width: 100%; max-width: 400px;"></button>
     </div>
 </div>
 
 <script>
+const ui = {
+    dir: "DIRECTION_VAL", align: "ALIGN_VAL", statusTitle: "STATUS_TITLE_VAL",
+    statusIdle: "STATUS_IDLE_VAL", statusNormal: "STATUS_NORMAL_VAL", statusHigh: "STATUS_HIGH_VAL",
+    indicatorTitle: "INDICATOR_TITLE_VAL", micBtnIdle: "MIC_BTN_IDLE_VAL", micBtnActive: "MIC_BTN_ACTIVE_VAL"
+};
+
+document.getElementById('aser-card').style.direction = ui.dir;
+document.getElementById('status-block').style.textAlign = ui.align;
+document.getElementById('status-title-lbl').innerText = ui.statusTitle;
+document.getElementById('status-text').innerText = ui.statusIdle;
+document.getElementById('indicator-title-lbl').innerText = ui.indicatorTitle;
+document.getElementById('micBtn').innerText = ui.micBtnIdle;
+
 const micBtn = document.getElementById('micBtn');
 const emojiDiv = document.getElementById('emoji');
 const statusTxt = document.getElementById('status-text');
@@ -167,12 +154,9 @@ let stateTimer = null;
 micBtn.onclick = async function() {
     if (isListening) return;
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, 
-            video: false 
-        });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false });
         isListening = true;
-        micBtn.innerText = "MIC_BTN_ACTIVE_HOLDER";
+        micBtn.innerText = ui.micBtnActive;
         micBtn.style.backgroundColor = "#10B981";
         
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -182,7 +166,6 @@ micBtn.onclick = async function() {
         
         analyser.smoothingTimeConstant = 0.8;
         analyser.fftSize = 256;
-        
         microphone.connect(analyser);
         analyser.connect(javascriptNode);
         javascriptNode.connect(audioContext.destination);
@@ -201,17 +184,16 @@ micBtn.onclick = async function() {
             percentageTxt.innerText = targetPercentage + "%";
             
             let targetState = "sleep";
-            if (targetPercentage >= 70) {
-                targetState = "high";
-            } else if (targetPercentage >= 20) {
-                targetState = "normal";
-            }
+            if (targetPercentage >= 70) { targetState = "high"; }
+            else if (targetPercentage >= 20) { targetState = "normal"; }
             
             if (targetState !== stableState) {
                 if (!stateTimer) {
                     stateTimer = setTimeout(() => {
                         stableState = targetState;
-                        updateVisuals(stableState);
+                        if (stableState === "high") { emojiDiv.innerText = "🤩"; statusTxt.innerText = ui.statusHigh; }
+                        else if (stableState === "normal") { emojiDiv.innerText = "😊"; statusTxt.innerText = ui.statusNormal; }
+                        else { emojiDiv.innerText = "🥱"; statusTxt.innerText = ui.statusIdle; }
                         stateTimer = null;
                     }, 350);
                 }
@@ -219,4 +201,60 @@ micBtn.onclick = async function() {
                 if (stateTimer) { clearTimeout(stateTimer); stateTimer = null; }
                 if (stableState === "high") progressBar.style.backgroundColor = "#10B981";
                 else if (stableState === "normal") progressBar.style.backgroundColor = "#3B82F6";
-                else progressBar.style.
+                else progressBar.style.backgroundColor = "#94A3B8";
+            }
+        }
+    } catch (err) { alert("Microphone error / خطأ في المايكروفون"); }
+};
+</script>
+"""
+
+# استبدال متغيرات الواجهة بشكل آمن وصارم لمنع تداخل اللغات
+configured_html = html_code\
+    .replace("DIRECTION_VAL", t["direction"])\
+    .replace("ALIGN_VAL", t["align"])\
+    .replace("STATUS_TITLE_VAL", t["status_title"])\
+    .replace("STATUS_IDLE_VAL", t["status_idle"])\
+    .replace("STATUS_NORMAL_VAL", t["status_normal"])\
+    .replace("STATUS_HIGH_VAL", t["status_high"])\
+    .replace("INDICATOR_TITLE_VAL", t["indicator_title"])\
+    .replace("MIC_BTN_IDLE_VAL", t["mic_btn_idle"])\
+    .replace("MIC_BTN_ACTIVE_VAL", t["mic_btn_active"])
+
+components.html(configured_html, height=240)
+st.write("")
+
+# --- 6. حقل النصوص المدمجة والمدخلات ذو الاتجاه المتغير ---
+st.markdown(f"<p style='font-weight: 600; color: #475569; font-size: 14px; margin-bottom: 5px;'>{t['input_label']}</p>", unsafe_allow_html=True)
+
+selected_passage = st.selectbox(
+    label="Passage Selector",
+    options=t["passages"],
+    label_visibility="collapsed"
+)
+
+default_text_val = "" if selected_passage == t["custom_text"] else selected_passage
+
+teacher_text = st.text_area(
+    label="Text Area",
+    placeholder=t["placeholder"],
+    value=default_text_val,
+    height=90,
+    label_visibility="collapsed"
+)
+
+if teacher_text and teacher_text != st.session_state.last_text:
+    st.session_state.last_text = teacher_text
+    if client:
+        try:
+            prompt = f"أنت طالب ذكي ومشجع اسمه آسر. رد باختصار شديد جداً (سطر واحد) وبأسلوب تعليمي لطيف ومشجع بنفس لغة النص التالية التي كتبها لك معلمك أو صديقك الآن: {teacher_text}."
+            if st.session_state.lang == "English":
+                prompt = f"You are a smart and encouraging student named Aser. Reply very briefly (one short line) in a kind and educational manner in English to this sentence written by your teacher or friend: {teacher_text}."
+                
+            response = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
+            st.session_state.ai_reply = response.text
+        except:
+            st.session_state.ai_reply = t["ai_default"]
+
+st.markdown(f"<p style='font-weight: 600; color: #475569; font-size: 14px; margin-bottom: 5px;'>{t['ai_label']}</p>", unsafe_allow_html=True)
+st.info(st.session_state.ai_reply)
