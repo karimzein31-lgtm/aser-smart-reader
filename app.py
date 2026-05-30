@@ -2,14 +2,9 @@ import streamlit as st
 from google import genai
 import streamlit.components.v1 as components
 
-# --- 1. إعدادات الصفحة الأساسية ---
-st.set_page_config(
-    page_title="منصة آسر التعليمية | Aser Platform",
-    page_icon="🤖",
-    layout="centered"
-)
+# --- 1. إعدادات الصفحة واللغة ---
+st.set_page_config(page_title="منصة آسر التعليمية", page_icon="🤖", layout="centered")
 
-# --- 2. نظام إدارة اللغات والترجمات ---
 if "lang" not in st.session_state:
     st.session_state.lang = "العربية"
 
@@ -20,10 +15,10 @@ with col_lang:
         st.session_state.lang = current_lang
         st.rerun()
 
+# --- 2. قاموس البيانات والنصوص المطولة المدمجة ---
 translations = {
     "العربية": {
-        "direction": "rtl",
-        "align": "right",
+        "direction": "rtl", "align": "right",
         "title": "منصة آسِر الذكية للتفاعل الصوتي",
         "subtitle": "بيئة تعليمية متطورة لتحليل نبرة الحماس أثناء القراءة مباشرة",
         "input_label": "📖 اختر نصاً كاملاً للقراءة أو اكتب نصك الخاص:",
@@ -37,17 +32,12 @@ translations = {
             "النجاح ليس مفتاح السعادة، بل إن السعادة الحقيقية والرضا الداخلي هما المفتاح الأساسي للنجاح. إذا كنت تحب ما تفعله، وتمتلك الشغف اليومي للاستمرار والتعلم من الأخطاء دون استسلام، فستصل بالتأكيد إلى أهدافك وتصنع لنفسك مساراً متميزاً يلهم الآخرين من حولك.",
             "القراءة هي الغذاء الحقيقي للعقل، وهي النافذة السحرية التي تفتح لنا أبواب المعرفة الواسعة وتأخذنا في رحلات مذهلة عبر الزمن والبلدان دون أن نتحرك من مكاننا. من يعشق القراءة لا يشعر بالوحدة أبداً، لأن الكتب تصبح أعز أصدقائه وتمنحه الحكمة والخبرة لمواجهة الحياة."
         ],
-        "mic_btn_idle": "🎙️ اضغط لتفعيل الاتصال الصوتي المباشر",
-        "mic_btn_active": "🟢 النظام متصل ويحلل صوتك الآن...",
-        "status_idle": "آسر في انتظار بدء القراءة المستمرة...",
-        "status_normal": "قراءة ممتازة ونبرة صوتية واضحة ومستقرة",
-        "status_high": "أداء مذهل! نبرة مليئة بالحماس والطاقة العالية",
-        "indicator_title": "📊 مؤشر التفاعل الصوتي اللحظي",
-        "status_title": "حالة المساعد الذكي"
+        "mic_idle": "🎙️ اضغط لتفعيل الاتصال الصوتي المباشر", "mic_active": "🟢 النظام متصل ويحلل صوتك الآن...",
+        "status_idle": "آسر في انتظار بدء القراءة المستمرة...", "status_normal": "قراءة ممتازة ونبرة صوتية واضحة ومستقرة", "status_high": "أداء مذهل! نبرة مليئة بالحماس والطاقة العالية",
+        "indicator_title": "📊 مؤشر التفاعل الصوتي اللحظي", "status_title": "حالة المساعد الذكي"
     },
     "English": {
-        "direction": "ltr",
-        "align": "left",
+        "direction": "ltr", "align": "left",
         "title": "Aser Smart Audio Interactive Platform",
         "subtitle": "An advanced educational environment to analyze reading enthusiasm in real-time",
         "input_label": "📖 Choose a full passage or write your own:",
@@ -61,19 +51,15 @@ translations = {
             "Reading is to the mind what physical exercise is to the human body. It continuously expands our horizons, enhances our critical thinking, and inspires our souls to reach greatness. When you open a book, you explore new ideas and travel through unique worlds and times without moving an inch from your comfortable seat.",
             "Believe you can and you are already halfway there. Confidence, combined with passion and unyielding enthusiasm, is the ultimate driver of human achievements. No matter how many challenges you face on your journey, maintaining a positive mindset and a strong voice will always guide you directly to victory."
         ],
-        "mic_btn_idle": "🎙️ Click to activate live voice connection",
-        "mic_btn_active": "🟢 System is connected and analyzing your voice...",
-        "status_idle": "Aser is waiting for you to start reading continuously...",
-        "status_normal": "Excellent reading with a clear and stable tone",
-        "status_high": "Amazing performance! Full of enthusiasm and high energy",
-        "indicator_title": "📊 Real-time Voice Engagement Indicator",
-        "status_title": "Assistant Status"
+        "mic_idle": "🎙️ Click to activate live voice connection", "mic_active": "🟢 System is connected and analyzing your voice...",
+        "status_idle": "Aser is waiting for you to start reading continuously...", "status_normal": "Excellent reading with a clear and stable tone", "status_high": "Amazing performance! Full of enthusiasm and high energy",
+        "indicator_title": "📊 Real-time Voice Engagement Indicator", "status_title": "Assistant Status"
     }
 }
 
 t = translations[st.session_state.lang]
 
-# --- 3. تصميم الـ CSS المطور (لتكبير الخط وتوسيع الحقل) ---
+# --- 3. تصميم الـ CSS وتكبير الخط لـ 18px ---
 st.markdown(f"""
     <style>
     .stApp {{ background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%); }}
@@ -81,111 +67,119 @@ st.markdown(f"""
     .subtitle {{ color: #64748B; text-align: center; font-family: 'Segoe UI', sans-serif; font-size: 15px; margin-bottom: 25px; }}
     div[data-baseweb="input"], div[data-baseweb="select"] {{ border-radius: 12px !important; }}
     div[data-testid="stMarkdownContainer"] {{ text-align: {t['align']}; }}
-    
-    /* ستايل مخصص لتكبير خط حقل النصوص وجعله مريحاً جداً للقراءة */
-    textarea {{
-        font-size: 18px !important;
-        font-family: 'Segoe UI', system-ui, sans-serif !important;
-        line-height: 1.6 !important;
-        color: #334155 !important;
-    }}
+    textarea {{ font-size: 18px !important; font-family: 'Segoe UI', sans-serif !important; line-height: 1.6 !important; color: #334155 !important; }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. إعداد مفتاح ومكتبة Google GenAI ---
+# --- 4. إعداد الـ API ---
 API_KEY = "AIzaSyAOBg67pMTj2gYrc7PCs2MmRzQGhfedGmI"
-
 @st.cache_resource
 def get_ai_client():
-    if API_KEY and "ضـع" not in API_KEY:
-        return genai.Client(api_key=API_KEY)
-    return None
-
+    return genai.Client(api_key=API_KEY) if (API_KEY and "ضـع" not in API_KEY) else None
 client = get_ai_client()
 
 st.markdown(f"<div class='main-title'>{t['title']}</div>", unsafe_allow_html=True)
 st.markdown(f"<div class='subtitle'>{t['subtitle']}</div>", unsafe_allow_html=True)
 
-if "ai_reply" not in st.session_state:
-    st.session_state.ai_reply = t["ai_default"]
-if "last_text" not in st.session_state:
-    st.session_state.last_text = ""
+if "ai_reply" not in st.session_state: st.session_state.ai_reply = t["ai_default"]
+if "last_text" not in st.session_state: st.session_state.last_text = ""
 
-# --- 5. واجهة المايكروفون والمؤشر اللحظي الهجينة والنظيفة ---
+# --- 5. كود الـ HTML وجافا سكريبت المختصر والمحمي من السقوط ---
 html_code = """
-<div id="aser-card" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); font-family: 'Segoe UI', sans-serif;">
-    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px;">
-        <div id="emoji" style="font-size: 55px; background: #F8FAFC; padding: 10px 20px; border-radius: 50%; transition: all 0.4s ease;">😴</div>
-        <div id="status-block">
-            <div id="status-title-lbl" style="color: #94A3B8; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 2px;"></div>
-            <div id="status-text" style="color: #334155; font-size: 15px; font-weight: 600;"></div>
+<div id="box" style="background:#FFF; border:1px solid #E2E8F0; border-radius:16px; padding:25px; box-shadow:0 4px 6px rgba(0,0,0,0.05); font-family:sans-serif;">
+    <div style="display:flex; align-items:center; justify-content:center; gap:20px; margin-bottom:20px;">
+        <div id="emoji" style="font-size:55px; background:#F8FAFC; padding:10px 20px; border-radius:50%;">😴</div>
+        <div id="stBlock">
+            <div id="lblTitle" style="color:#94A3B8; font-size:12px; font-weight:600;"></div>
+            <div id="lblStatus" style="color:#334155; font-size:15px; font-weight:600;"></div>
         </div>
     </div>
-    <div style="margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">
-            <span id="indicator-title-lbl"></span>
-            <span id="percentage-txt">0%</span>
+    <div style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:between; font-size:13px; font-weight:600; color:#475569; margin-bottom:6px;">
+            <span id="lblInd"></span> <span id="txtPerc">0%</span>
         </div>
-        <div style="background-color: #F1F5F9; border-radius: 9999px; height: 8px; width: 100%; overflow: hidden;">
-            <div id="progress-bar" style="background-color: #2563EB; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+        <div style="background:#F1F5F9; border-radius:9999px; height:8px; overflow:hidden;">
+            <div id="bar" style="background:#2563EB; height:100%; width:0%; transition:width 0.3s;"></div>
         </div>
     </div>
-    <div style="text-align: center;">
-        <button id="micBtn" style="background-color: #2563EB; color: #FFFFFF; border: none; padding: 14px 40px; border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: 600; width: 100%; max-width: 400px;"></button>
-    </div>
+    <div style="text-align:center;"><button id="btn" style="background:#2563EB; color:#FFF; border:none; padding:14px 40px; border-radius:10px; font-size:15px; font-weight:600; width:100%; max-width:400px; cursor:pointer;"></button></div>
 </div>
-
 <script>
-const ui = {
-    dir: "DIRECTION_VAL", align: "ALIGN_VAL", statusTitle: "STATUS_TITLE_VAL",
-    statusIdle: "STATUS_IDLE_VAL", statusNormal: "STATUS_NORMAL_VAL", statusHigh: "STATUS_HIGH_VAL",
-    indicatorTitle: "INDICATOR_TITLE_VAL", micBtnIdle: "MIC_BTN_IDLE_VAL", micBtnActive: "MIC_BTN_ACTIVE_VAL"
-};
+const cfg = { dir: "D_V", align: "A_V", title: "T_V", idle: "I_V", norm: "N_V", high: "H_V", ind: "IND_V", act: "ACT_V", bIdle: "B_I_V" };
+document.getElementById('box').style.direction = cfg.dir;
+document.getElementById('stBlock').style.textAlign = cfg.align;
+document.getElementById('lblTitle').innerText = cfg.title;
+document.getElementById('lblStatus').innerText = cfg.idle;
+document.getElementById('lblInd').innerText = cfg.ind;
+document.getElementById('btn').innerText = cfg.bIdle;
 
-document.getElementById('aser-card').style.direction = ui.dir;
-document.getElementById('status-block').style.textAlign = ui.align;
-document.getElementById('status-title-lbl').innerText = ui.statusTitle;
-document.getElementById('status-text').innerText = ui.statusIdle;
-document.getElementById('indicator-title-lbl').innerText = ui.indicatorTitle;
-document.getElementById('micBtn').innerText = ui.micBtnIdle;
+const btn = document.getElementById('btn'); const emoji = document.getElementById('emoji');
+const lblStatus = document.getElementById('lblStatus'); const bar = document.getElementById('bar'); const txtPerc = document.getElementById('txtPerc');
+let isList = false; let stable = "sleep"; let timer = null;
 
-const micBtn = document.getElementById('micBtn');
-const emojiDiv = document.getElementById('emoji');
-const statusTxt = document.getElementById('status-text');
-const progressBar = document.getElementById('progress-bar');
-const percentageTxt = document.getElementById('percentage-txt');
-let isListening = false;
-let stableState = "sleep"; 
-let stateTimer = null;
-
-micBtn.onclick = async function() {
-    if (isListening) return;
+btn.onclick = async function() {
+    if (isList) return;
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false });
-        isListening = true;
-        micBtn.innerText = ui.micBtnActive;
-        micBtn.style.backgroundColor = "#10B981";
-        
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioContext.createAnalyser();
-        const microphone = audioContext.createMediaStreamSource(stream);
-        const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
-        
-        analyser.smoothingTimeConstant = 0.8;
-        analyser.fftSize = 256;
-        microphone.connect(analyser);
-        analyser.connect(javascriptNode);
-        javascriptNode.connect(audioContext.destination);
-        
-        javascriptNode.onaudioprocess = function() {
-            let array = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteFrequencyData(array);
-            let values = 0;
-            for (let i = 0; i < array.length; i++) { values += array[i]; }
-            let average = values / array.length;
-            
-            if (average < 5) average = 0; 
-            let targetPercentage = Math.min(Math.round((average / 45) * 100), 100);
-            
-            progressBar.style.width = targetPercentage + "%";
-            percentageTxt.innerText = targetPercentage +
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true }, video:false });
+        isList = true; btn.innerText = cfg.act; btn.style.backgroundColor = "#10B981";
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ans = ctx.createAnalyser(); ctx.createMediaStreamSource(stream).connect(ans);
+        const node = ctx.createScriptProcessor(2048, 1, 1); ans.connect(node); node.connect(ctx.destination);
+        ans.smoothingTimeConstant = 0.8; ans.fftSize = 256;
+        node.onaudioprocess = function() {
+            let arr = new Uint8Array(ans.frequencyBinCount); ans.getByteFrequencyData(arr);
+            let v = 0; for(let i=0; i<arr.length; i++) { v += arr[i]; }
+            let avg = v / arr.length; if (avg < 5) avg = 0;
+            let pct = Math.min(Math.round((avg / 45) * 100), 100);
+            bar.style.width = pct + "%"; txtPerc.innerText = pct + "%";
+            let tState = pct >= 70 ? "high" : (pct >= 20 ? "normal" : "sleep");
+            if (tState !== stable) {
+                if (!timer) {
+                    timer = setTimeout(() => {
+                        stable = tState;
+                        if (stable === "high") { emoji.innerText = "🤩"; lblStatus.innerText = cfg.high; }
+                        else if (stable === "normal") { emoji.innerText = "😊"; lblStatus.innerText = cfg.norm; }
+                        else { emoji.innerText = "🥱"; lblStatus.innerText = cfg.idle; }
+                        timer = null;
+                    }, 350);
+                }
+            } else {
+                if(timer) { clearTimeout(timer); timer = null; }
+                bar.style.backgroundColor = stable === "high" ? "#10B981" : (stable === "normal" ? "#3B82F6" : "#94A3B8");
+            }
+        }
+    } catch(e) { alert("Microphone error"); }
+};
+</script>
+"""
+
+configured_html = html_code\
+    .replace("D_V", t["direction"]).replace("A_V", t["align"])\
+    .replace("T_V", t["status_title"]).replace("I_V", t["status_idle"])\
+    .replace("N_V", t["status_normal"]).replace("H_V", t["status_high"])\
+    .replace("IND_V", t["indicator_title"]).replace("B_I_V", t["mic_idle"]).replace("ACT_V", t["mic_active"])
+
+components.html(configured_html, height=240)
+st.write("")
+
+# --- 6. حقل المدخلات المطور ---
+st.markdown(f"<p style='font-weight: 600; color: #475569; font-size: 14px; margin-bottom: 5px;'>{t['input_label']}</p>", unsafe_allow_html=True)
+
+selected_passage = st.selectbox(label="Passage Selector", options=t["passages"], label_visibility="collapsed")
+default_text_val = "" if selected_passage == t["custom_text"] else selected_passage
+
+teacher_text = st.text_area(label="Text Area", placeholder=t["placeholder"], value=default_text_val, height=180, label_visibility="collapsed")
+
+if teacher_text and teacher_text != st.session_state.last_text:
+    st.session_state.last_text = teacher_text
+    if client:
+        try:
+            prompt = f"أنت طالب ذكي ومشجع اسمه آسر. رد باختصار شديد جداً (سطر واحد) وبأسلوب تعليمي لطيف ومشجع بنفس لغة النص التالية: {teacher_text}."
+            if st.session_state.lang == "English":
+                prompt = f"You are a smart and encouraging student named Aser. Reply very briefly (one short line) in English to this sentence: {teacher_text}."
+            st.session_state.ai_reply = client.models.generate_content(model="gemini-1.5-flash", contents=prompt).text
+        except:
+            st.session_state.ai_reply = t["ai_default"]
+
+st.markdown(f"<p style='font-weight: 600; color: #475569; font-size: 14px; margin-bottom: 5px;'>{t['ai_label']}</p>", unsafe_allow_html=True)
+st.info(st.session_state.ai_reply)
