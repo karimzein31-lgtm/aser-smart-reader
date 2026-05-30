@@ -137,7 +137,7 @@ micBtn.onclick = async function() {
             let average = values / array.length;
             
             // رفع حد تجاهل الأصوات الهادئة كلياً (عتبة الصمت) لقتل الحساسية الخلفية
-            if (average < 15) average = 0; 
+            if (average < 15) average = 15; 
             
             // كبح الحماس الصوتي: رفعنا القاسم هنا من 55 إلى 120 لكي لا تصل لـ 100% إلا بالصراخ أو الحماس الشديد
             let targetPercentage = Math.min(Math.round((average / 65 ) * 100), 100);
