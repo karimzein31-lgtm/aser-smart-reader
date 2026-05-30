@@ -140,7 +140,7 @@ micBtn.onclick = async function() {
             if (average < 15) average = 0; 
             
             // كبح الحماس الصوتي: رفعنا القاسم هنا من 55 إلى 120 لكي لا تصل لـ 100% إلا بالصراخ أو الحماس الشديد
-            let targetPercentage = Math.min(Math.round((average / 120) * 100), 100);
+            let targetPercentage = Math.min(Math.round((average / 45 ) * 100), 100);
             
             progressBar.style.width = targetPercentage + "%";
             percentageTxt.innerText = targetPercentage + "%";
